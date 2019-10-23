@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+
+import RPi.GPIO as GPIO
+from mfrc522 import SimpleMFRC522
+from time import sleep
+from gpiozero import LED
+
+ledRød = LED(2)
+ledGrøn = LED(3)
+ledVand = LED(4)
+
+
+def slow_type(message):
+        for character in message:
+                print(character, end="")
+                sleep(0.01)
+        print ("\n")
+
+
+reader = SimpleMFRC522
+
+slow_type("Placer Kort")
+
+try:
+        while True:
+                id, text = reader().read()
+                sleep(0.1)
+                if id == 196317249165:
+                        slow_type("Gyldigt Kort")
+                        print (id)
+                        print (text)
+                        print ("\n")
+                        ledGrøn.on()
+                        sleep(3)
+                        ledGrøn.off()
+                        ledVand.on()
+                        sleep(10)
+                        ledVand.off()
+
+                else:
+                        slow_type("Ugyldigt Kort")
+                        print (id)
+                        print (text)
+                        print ("\n")
+                        ledRød.on()
+                        sleep(3)
+                        ledRød.off()
+
+
+except KeyboardInterrupt:
+        slow_type("Afslutter Program")
+
+finally:
+        GPIO.cleanup()
